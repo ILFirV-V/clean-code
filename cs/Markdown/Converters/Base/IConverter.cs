@@ -1,6 +1,8 @@
-﻿namespace Markdown.Converters.Base;
+﻿using Markdown.Models;
+
+namespace Markdown.Converters.Base;
 
 public interface IConverter
 {
-    public string Convert(string text);
+    public IEnumerable<TagPair> Convert(string text);
 }

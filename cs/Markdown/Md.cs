@@ -1,5 +1,4 @@
-﻿using Markdown.Models;
-using Markdown.Readers;
+﻿using Markdown.Readers;
 
 namespace Markdown;
 
