@@ -21,7 +21,7 @@ public abstract class BaseConverter : IConverter
         var tagPairBuilder = TagPair.CreateBuilder(GetType());
         while (index < text.Length)
         {
-            if (!isInTag && IsTagStart(text, index) && !HasShielding(text, index - 1))
+            if (!isInTag && IsTagStart(text, index))
             {
                 isBetweenWord = HasBetweenWord(text, index);
                 var token = new TagToken(StartOriginalValue, StartConvertedValue, index);
@@ -38,7 +38,7 @@ public abstract class BaseConverter : IConverter
                 continue;
             }
 
-            if (isInTag && IsTagEnd(text, index) && !HasShielding(text, index - 1))
+            if (isInTag && IsTagEnd(text, index))
             {
                 isBetweenWord = false;
                 var token = new TagToken(EndOriginalValue, EndConvertedValue, index);
@@ -51,16 +51,6 @@ public abstract class BaseConverter : IConverter
 
             index++;
         }
-    }
-
-    protected virtual bool HasShielding(string text, int index)
-    {
-        if (index < 0 || index >= text.Length)
-        {
-            return false;
-        }
-
-        return text[index].Equals('\\') && (index - 1 < 0 || !text[index - 1].Equals('\\'));
     }
 
     protected virtual bool HasBetweenWord(string text, int index)

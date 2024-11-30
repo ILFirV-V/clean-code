@@ -14,9 +14,6 @@ internal partial class ItalicConverterTests
     [
         new TestCaseData(string.Empty, Array.Empty<TagPair>())
             .SetName("EmptyInputString"),
-        new TestCaseData($"\\{markdownTagStart}Вот это\\{markdownTagEnd}, не должно выделиться тегом.",
-                Array.Empty<TagPair>())
-            .SetName("EscapedUnderscores"),
         new TestCaseData(
                 $"Подчерки внутри текста c цифрами{markdownTagStart}12{markdownTagEnd}3 не считаются выделением и должны оставаться символами подчерка.",
                 Array.Empty<TagPair>())

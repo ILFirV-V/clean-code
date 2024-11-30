@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using Markdown.Models;
 
 namespace Markdown.Tests;
 
@@ -7,7 +6,7 @@ namespace Markdown.Tests;
 [TestOf(typeof(Md))]
 public partial class MdTests
 {
-    private Md md = new();
+    private readonly Md md = new();
     
     [Test]
     [TestCaseSource(nameof(conversionTestCases))]

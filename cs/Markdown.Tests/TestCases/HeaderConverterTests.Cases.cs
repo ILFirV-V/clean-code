@@ -14,8 +14,6 @@ public partial class HeaderConverterTests
     [
         new TestCaseData(string.Empty, Array.Empty<TagPair>())
             .SetName("EmptyInputString"),
-        new TestCaseData($"\\{markdownTagStart}Вот это, не должно выделиться тегом.", Array.Empty<TagPair>())
-            .SetName("EscapedUnderscores"),
     ];
 
     private static readonly IEnumerable<TestCaseData> conversionTestCases =
@@ -30,15 +28,5 @@ public partial class HeaderConverterTests
                         .Build(),
                 })
             .SetName("BasicHeader"),
-        new TestCaseData($"\\\\{markdownTagStart}Заголовок с двойным экранированием",
-                new[]
-                {
-                    TagPair
-                        .CreateBuilder(typeof(HeaderConverter))
-                        .AddOpenToken(new TagToken(markdownTagStart, htmlTagStart, 2))
-                        .AddCloseToken(new TagToken(markdownTagEnd, htmlTagEnd, 37))
-                        .Build(),
-                })
-            .SetName("HeaderWithIncorrectStart"),
     ];
 }

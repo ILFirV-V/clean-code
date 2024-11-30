@@ -22,35 +22,31 @@ public class MarkdownToHtmlConverter
         {
             tokens.AddRange(converter.Convert(text).ToList());
         }
-
-        var converterTokens = tokens
-            .FilterNonIntersectingTagPairs()
-            .ToDictionaryByType();
-        converterTokens = FilterBoldTokens(converterTokens);
-        var replacementTokens = converterTokens.SelectMany(x => x.Value);
+        var converterTokenPairs = tokens.FilterNonIntersectingTagPairs();
+        var replacementTokens = FilterBoldTokens(converterTokenPairs)
+            .FilterShielding(text);
         return RestoreToHtmlText(replacementTokens, text);
     }
 
-    private Dictionary<Type, List<TagPair>> FilterBoldTokens(Dictionary<Type, List<TagPair>> convertTokens)
+    private IEnumerable<TagPair> FilterBoldTokens(ICollection<TagPair> tokenPairs)
     {
+        var convertTokens = tokenPairs.ToDictionaryByType();
         if (!convertTokens.ContainsKey(typeof(BoldConverter))
             || !convertTokens.ContainsKey(typeof(ItalicConverter)))
         {
-            return convertTokens;
+            return tokenPairs;
         }
-
         var boldTokens = convertTokens[typeof(BoldConverter)];
         var italicTokens = convertTokens[typeof(ItalicConverter)];
         convertTokens[typeof(BoldConverter)] = boldTokens.FilterOverlapping(italicTokens);
-        return convertTokens;
+        var boldFilterTokens = convertTokens.SelectMany(x => x.Value);
+        return boldFilterTokens;
     }
 
-    private string RestoreToHtmlText(IEnumerable<TagPair> converterTokens, string originalText)
+    private string RestoreToHtmlText(IEnumerable<TagToken> converterTokens, string originalText)
     {
         var resultBuilder = new StringBuilder(originalText);
-        var replacements = converterTokens
-            .SelectMany<TagPair, TagToken>(t => [t.OpenToken!, t.CloseToken!])
-            .OrderByDescending(r => r.TagIndex);
+        var replacements = converterTokens.OrderByDescending(r => r.TagIndex);
         foreach (var token in replacements)
         {
             if (token.TagIndex >= originalText.Length)
@@ -63,7 +59,6 @@ public class MarkdownToHtmlConverter
                 resultBuilder.Insert(token.TagIndex, token.ReplaceTag);
             }
         }
-
         return resultBuilder.ToString();
     }
 }

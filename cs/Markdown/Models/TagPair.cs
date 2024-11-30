@@ -2,9 +2,9 @@
 
 public record TagPair
 {
-    public Type ConverterType { get; init; }
-    public TagToken OpenToken { get; init; }
-    public TagToken CloseToken { get; init; }
+    public Type ConverterType { get; private init; }
+    public TagToken OpenToken { get; private init; }
+    public TagToken CloseToken { get; private init; }
 
     public bool IsIntersecting(TagPair otherTagPair)
     {
