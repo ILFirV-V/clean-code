@@ -6,7 +6,7 @@ public partial class MdTests
     [
         new TestCaseData(
                 "# Заголовок с разными символами ",
-                "<h1>Заголовок с разными символами </h1>")
+                "<h1>Заголовок с разными символами</h1>")
             .SetName("SimpleHeadline"),
         new TestCaseData(
                 "Текст, _окруженный с двух сторон_ одинарными символами подчерка",

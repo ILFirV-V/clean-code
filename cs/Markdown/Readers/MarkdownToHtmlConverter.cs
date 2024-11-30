@@ -22,6 +22,7 @@ public class MarkdownToHtmlConverter
         {
             tokens.AddRange(converter.Convert(text).ToList());
         }
+
         var converterTokenPairs = tokens.FilterNonIntersectingTagPairs();
         var replacementTokens = FilterBoldTokens(converterTokenPairs)
             .FilterShielding(text);
@@ -36,6 +37,7 @@ public class MarkdownToHtmlConverter
         {
             return tokenPairs;
         }
+
         var boldTokens = convertTokens[typeof(BoldConverter)];
         var italicTokens = convertTokens[typeof(ItalicConverter)];
         convertTokens[typeof(BoldConverter)] = boldTokens.FilterOverlapping(italicTokens);
@@ -45,20 +47,26 @@ public class MarkdownToHtmlConverter
 
     private string RestoreToHtmlText(IEnumerable<TagToken> converterTokens, string originalText)
     {
-        var resultBuilder = new StringBuilder(originalText);
-        var replacements = converterTokens.OrderByDescending(r => r.TagIndex);
+        var replacements = converterTokens.OrderBy(r => r.TagIndex);
+        var resultBuilder = new StringBuilder();
+        var lastIndex = 0;
+
         foreach (var token in replacements)
         {
-            if (token.TagIndex >= originalText.Length)
+            if (token.TagIndex > lastIndex)
             {
-                resultBuilder.AppendLine(token.ReplaceTag);
+                resultBuilder.Append(originalText.AsSpan(lastIndex, token.TagIndex - lastIndex));
             }
-            else
-            {
-                resultBuilder.Remove(token.TagIndex, token.SearchTag.Length);
-                resultBuilder.Insert(token.TagIndex, token.ReplaceTag);
-            }
+
+            resultBuilder.Append(token.ReplaceTag);
+            lastIndex = token.TagIndex + token.SearchTag.Length;
         }
+
+        if (lastIndex < originalText.Length)
+        {
+            resultBuilder.Append(originalText.AsSpan(lastIndex));
+        }
+
         return resultBuilder.ToString();
     }
 }

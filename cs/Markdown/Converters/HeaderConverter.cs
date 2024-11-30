@@ -9,5 +9,5 @@ public class HeaderConverter : BaseHeaderConverter
     protected override string StartOriginalValue => "# ";
     protected override string EndOriginalValue => "\n";
     protected override string StartConvertedValue => "<h1>";
-    protected override string EndConvertedValue => " </h1>";
+    protected override string EndConvertedValue => "</h1>";
 }

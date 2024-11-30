@@ -28,35 +28,99 @@ public static class TagPairExtensions
         return filteredTokens;
     }
 
-    public static HashSet<TagPair> FilterNonIntersectingTagPairs(this IEnumerable<TagPair> tokens)
+    public static HashSet<TagPair> FilterNonIntersectingTagPairs(this ICollection<TagPair> tagPairs)
     {
-        ArgumentNullException.ThrowIfNull(tokens);
-        var validTokens = new HashSet<TagPair>();
-        var orderTokens = tokens
-            .OrderBy(x => x.OpenToken.TagIndex);
-        foreach (var tagPair in orderTokens)
+        ArgumentNullException.ThrowIfNull(tagPairs);
+        if (tagPairs.Count == 0)
         {
-            var intersects = false;
-            foreach (var otherPair in validTokens)
-            {
-                if (!tagPair.IsIntersecting(otherPair)
-                    && !otherPair.IsIntersecting(tagPair))
-                {
-                    continue;
-                }
+            return [..tagPairs];
+        }
 
-                intersects = true;
-                validTokens.Remove(otherPair);
-                break;
+        var startIndex = 1;
+        var tagIndexToPairIndexMap = CreateTagIndexMap(tagPairs, startIndex);
+        var pairIndexToTagPairMap = CreatePairIndexToTagPairMap(tagPairs, startIndex);
+        var invalidPairIndices = FindInvalidPairIndices(tagIndexToPairIndexMap);
+        return GetValidPairs(pairIndexToTagPairMap, invalidPairIndices);
+    }
+
+    private static int[] CreateTagIndexMap(ICollection<TagPair> tagPairs, int startIndex)
+    {
+        var maxTagIndex = tagPairs.Max(pair => pair.CloseToken!.TagIndex);
+        var tagIndexToPairIndexMap = new int[maxTagIndex + 1];
+        var pairIndex = startIndex;
+
+        foreach (var tagPair in tagPairs)
+        {
+            tagIndexToPairIndexMap[tagPair.OpenToken.TagIndex] = pairIndex;
+            tagIndexToPairIndexMap[tagPair.CloseToken.TagIndex] = pairIndex;
+            pairIndex++;
+        }
+
+        return tagIndexToPairIndexMap;
+    }
+
+    private static Dictionary<int, TagPair> CreatePairIndexToTagPairMap(ICollection<TagPair> tagPairs, int startIndex)
+    {
+        var pairIndexToTagPairMap = new Dictionary<int, TagPair>();
+        var pairIndex = startIndex;
+        foreach (var tagPair in tagPairs)
+        {
+            pairIndexToTagPairMap.Add(pairIndex, tagPair);
+            pairIndex++;
+        }
+
+        return pairIndexToTagPairMap;
+    }
+
+
+    private static HashSet<int> FindInvalidPairIndices(IEnumerable<int> tagIndexToPairIndexMap)
+    {
+        var openTags = new Stack<int>();
+        var currentlyOpenTags = new HashSet<int>();
+        var invalidPairIndices = new HashSet<int>();
+        foreach (var pairIndexFromMap in tagIndexToPairIndexMap)
+        {
+            if (pairIndexFromMap != 0 && !currentlyOpenTags.Contains(pairIndexFromMap))
+            {
+                openTags.Push(pairIndexFromMap);
+                currentlyOpenTags.Add(pairIndexFromMap);
+                continue;
             }
 
-            if (!intersects)
+            if (pairIndexFromMap == 0 || !currentlyOpenTags.Contains(pairIndexFromMap))
             {
-                validTokens.Add(tagPair);
+                continue;
+            }
+
+            var topPairIndex = openTags.Peek();
+            currentlyOpenTags.Remove(pairIndexFromMap);
+            if (topPairIndex != pairIndexFromMap)
+            {
+                invalidPairIndices.Add(topPairIndex);
+                invalidPairIndices.Add(pairIndexFromMap);
+            }
+            else
+            {
+                openTags.Pop();
             }
         }
 
-        return validTokens;
+        return invalidPairIndices;
+    }
+
+    private static HashSet<TagPair> GetValidPairs(IDictionary<int, TagPair> pairIndexToTagPairMap,
+        HashSet<int> invalidPairIndices)
+    {
+        var allPairIndices = pairIndexToTagPairMap.Keys;
+        foreach (var item in allPairIndices)
+        {
+            if (invalidPairIndices.Contains(item))
+            {
+                pairIndexToTagPairMap.Remove(item);
+            }
+        }
+
+        return [..pairIndexToTagPairMap.Values];
     }
 
     public static IDictionary<Type, IList<TagPair>> ToDictionaryByType(this IEnumerable<TagPair> validTokens)
