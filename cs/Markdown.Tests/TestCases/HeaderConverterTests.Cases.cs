@@ -8,7 +8,7 @@ public partial class HeaderConverterTests
     private const string markdownTagStart = "# ";
     private const string markdownTagEnd = "\n";
     private const string htmlTagStart = "<h1>";
-    private const string htmlTagEnd = " </h1>";
+    private const string htmlTagEnd = "</h1>";
 
     private static readonly IEnumerable<TestCaseData> noConversionTestCases =
     [
