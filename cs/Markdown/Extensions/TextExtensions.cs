@@ -1,14 +1,18 @@
 ﻿namespace Markdown.Extensions;
 
-public static class TextExtensions
+internal static class TextExtensions
 {
-    public static bool IsInBounds(this string text, int index, int length)
+    internal static bool IsInBounds(this string text, int index, int length)
     {
+        ArgumentNullException.ThrowIfNull(text);
+
         return index >= 0 && index + length <= text.Length;
     }
 
-    public static bool HasFollowingSpace(this string text, int index)
+    internal static bool HasFollowingSpace(this string text, int index)
     {
+        ArgumentNullException.ThrowIfNull(text);
+
         if (index < 0 || index >= text.Length)
         {
             return false;
@@ -17,8 +21,10 @@ public static class TextExtensions
         return char.IsWhiteSpace(text[index]);
     }
 
-    public static bool ContainsTagAtIndex(this string text, int index, string tagValue)
+    internal static bool ContainsTagAtIndex(this string text, int index, string tagValue)
     {
+        ArgumentNullException.ThrowIfNull(text);
+
         if (index < 0 || index + tagValue.Length > text.Length)
         {
             return false;
@@ -27,8 +33,10 @@ public static class TextExtensions
         return text.Substring(index, tagValue.Length).Equals(tagValue);
     }
 
-    public static bool HasAdjacentTag(this string text, int index, string tagValue)
+    internal static bool HasAdjacentTag(this string text, int index, string tagValue)
     {
+        ArgumentNullException.ThrowIfNull(text);
+
         if (index < 0 || index + tagValue.Length > text.Length)
         {
             return false;

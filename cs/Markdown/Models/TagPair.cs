@@ -2,20 +2,14 @@
 
 public record TagPair
 {
-    public Type ConverterType { get; private init; }
-    public TagToken OpenToken { get; private init; }
-    public TagToken CloseToken { get; private init; }
-
-    public bool IsIntersecting(TagPair otherTagPair)
-    {
-        return OpenToken.TagIndex < otherTagPair.OpenToken.TagIndex
-               && otherTagPair.OpenToken.TagIndex < CloseToken.TagIndex
-               && otherTagPair.OpenToken.TagIndex < CloseToken.TagIndex
-               && CloseToken.TagIndex < otherTagPair.CloseToken.TagIndex;
-    }
-
+    public Type ConverterType { get; init; }
+    public TagToken OpenToken { get; init; }
+    public TagToken CloseToken { get; init; }
+    
     public bool IsContains(TagPair otherTagPair)
     {
+        ArgumentNullException.ThrowIfNull(otherTagPair);
+
         return OpenToken.TagIndex < otherTagPair.OpenToken.TagIndex
                && otherTagPair.OpenToken.TagIndex < CloseToken.TagIndex
                && OpenToken.TagIndex < otherTagPair.CloseToken.TagIndex
