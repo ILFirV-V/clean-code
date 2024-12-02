@@ -24,7 +24,7 @@ public partial class HeaderConverterTests
                     TagPair
                         .CreateBuilder(typeof(HeaderConverter))
                         .AddOpenToken(new TagToken(markdownTagStart, htmlTagStart, 0))
-                        .AddCloseToken(new TagToken(markdownTagEnd, htmlTagEnd, 10))
+                        .AddCloseToken(new TagToken(markdownTagEnd, htmlTagEnd, 11))
                         .Build(),
                 })
             .SetName("BasicHeader"),

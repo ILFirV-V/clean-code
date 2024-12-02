@@ -15,6 +15,7 @@ public class MarkdownToHtmlConverter
         new ItalicConverter(),
         new BoldConverter(),
         new HeaderConverter(),
+        new BulletedListConverter(),
     ];
 
     public string ConvertMarkdownToHtml(string text)
